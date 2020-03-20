@@ -2,7 +2,10 @@
 #
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
-version: 2
+version: 2.1
+
+orbs:
+  windows: circleci/windows@2.4.0
 
 defaults: &defaults
   working_directory: ~/repo
@@ -55,6 +58,11 @@ jobs:
 
       # run browser tests
       - run: npm run test:browser
+  test-windows:
+    executor: windows/default
+    steps:
+      - checkout
+      - run: Write-Host 'Hello, Windows'
   test-bs:
     <<: *defaults
     steps:
@@ -91,16 +99,19 @@ workflows:
   test-deploy:
     jobs:
       - build
-      - test-local:
+      - test-windows:
           requires:
             - build
-      - test-bs:
-          requires:
-            - build
-      - deploy:
-          requires:
-            - test-local
-            - test-bs
-          filters:
-            branches:
-              only: master
+      # - test-local:
+      #     requires:
+      #       - build
+      # - test-bs:
+      #     requires:
+      #       - build
+      # - deploy:
+      #     requires:
+      #       - test-local
+      #       - test-bs
+      #     filters:
+      #       branches:
+      #         only: master
